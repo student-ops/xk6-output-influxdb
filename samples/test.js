@@ -11,30 +11,31 @@ import {
 
 const mqtt = require('k6/x/mqtt');
 
-const rnd_count = 4000;
+const rnd_count = 2000;
 
 // create random number to create a new topic at each run
 let rnd = Math.random() * rnd_count;
 
 // conection timeout (ms)
-let connectTimeout = 1000 * 30
+let connectTimeout = 2000
 
 // publish timeout (ms)
-let publishTimeout = 1000 * 10
+let publishTimeout = 2000
 
 // subscribe timeout (ms)
-let subscribeTimeout = 1000 * 10
+let subscribeTimeout = 2000
 
 // connection close timeout (ms)
-let closeTimeout = 1000 * 10
+let closeTimeout = 2000
+
 // Mqtt topic one per VU
-const k6Topic = `iot/vuoy_monitor/${rnd}-${__VU}`;
+const k6Topic = `test-k6-plugin-topic ${rnd} ${__VU}`;
 // Connect IDs one connection per VU
 const k6SubId = `k6-sub-${rnd}-${__VU}`;
 const k6PubId = `k6-pub-${rnd}-${__VU}`;
 
 // number of message pusblished and receives at each iteration
-const messageCount = 1;
+const messageCount = 3;
 
 const host = "localhost";
 const port = "1883";
@@ -99,21 +100,9 @@ if (err != undefined) {
     // fail("fatal could not connect to broker for subscribe")
 }
 
-const payload = {
-    Timestamp: new Date(),
-    Rssi: -52.3, // __VUの値を整数として使用
-    Tempreture: 28.3,
-    Moisture: 63.2,
-    AirPressure: 1024.8
-};
-
-
 export default function () {
     // Message content one per ITER
-    const jsonMsg = JSON.stringify(payload);
-
-    const k6Message = jsonMsg;
-
+    const k6Message = `k6-message-content-${rnd} ${__VU}:${__ITER}`;
     check(publisher, {
         "is publisher connected": publisher => publisher.isConnected()
     });
